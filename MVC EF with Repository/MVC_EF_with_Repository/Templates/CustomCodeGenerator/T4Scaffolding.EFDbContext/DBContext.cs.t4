@@ -1,0 +1,5 @@
+<#@ Template Language="C#" HostSpecific="True" #>
+<#@ assembly name="EnvDTE" #>
+<#@ parameter name="ModelType" type="EnvDTE.CodeType" #>
+
+public DbSet<<#= ModelType.Name #>> <#= ModelType.Name #> { get; set; }

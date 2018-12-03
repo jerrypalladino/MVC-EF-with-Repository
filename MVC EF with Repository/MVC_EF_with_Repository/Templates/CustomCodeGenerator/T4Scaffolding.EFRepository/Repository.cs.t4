@@ -1,0 +1,105 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Data.Linq" #>
+<#@ ScaffoldingAssembly Processor="ScaffoldingAssemblyLoader" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="Microsoft.AspNet.Scaffolding.Core.Metadata" #>
+<#@ parameter name="ModelType" type="EnvDTE.CodeType" #>
+<#@ parameter name="NamespaceParentNameOnly" type="System.String" #>
+<#@ parameter name="DBContextName" type="System.String" #>
+using System;
+using System.Data.Entity;
+using System.Linq;
+using System.Linq.Expressions;
+using <#= NamespaceParentNameOnly #>.Models;
+using <#= NamespaceParentNameOnly #>.Context;
+
+<#
+    var ModelName = ModelType.Name;
+    var modelType = (EnvDTE.CodeType)ModelType; 
+    var itemName =  ModelType.Name.ToLower();
+	var Namespace = NamespaceParentNameOnly + ".Repositories";
+    var primaryKeyProperty = ModelName + "Id";
+#>
+namespace <#= Namespace #>
+{
+    public class <#= ModelName #>Repository : I<#= ModelName #>Repository
+    {
+
+        <#=DBContextName#> context = new <#=DBContextName#>();
+
+        public IQueryable<<#= ModelName #>> All
+        {
+            get { return context.<#= ModelName #>; }
+        }
+
+        public IQueryable<<#= ModelName #>> AllIncluding(params Expression<Func<<#= ModelName #>, object>>[] includeProperties)
+        {
+            IQueryable<<#= ModelName #>> query = context.<#= ModelName #>;
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+            return query;
+        }
+
+        public <#= ModelName #> Find(int id)
+        {
+            return context.<#= ModelName #>.Find(id);
+        }
+
+        public void InsertOrUpdate(<#= ModelName #> <#= itemName #>)
+        {
+            if (<#= itemName #>.<#= primaryKeyProperty #> == default(int))
+            {
+                // New entity
+                context.<#= ModelName #>.Add(<#= itemName #>);
+            }
+            else
+            {
+                // Existing entity
+                context.Entry(<#= itemName #>).State = System.Data.Entity.EntityState.Modified;
+            }
+        }
+
+        public void Delete(int id)
+        {
+            var <#= itemName #> = context.<#= ModelName #>.Find(id);
+			<#= itemName #>.IsDeleted = true;
+            Save();
+        }
+
+        public void Save()
+        {
+            context.SaveChanges();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (context != null) context.Dispose();
+            }
+        }
+    }
+
+    public interface I<#= ModelName #>Repository : IDisposable
+    {
+        IQueryable<<#= ModelName #>> All { get; }
+        IQueryable<<#= ModelName #>> AllIncluding(params Expression<Func<<#= ModelName #>, object>>[] includeProperties);
+        <#= ModelName #> Find(int id);
+        void InsertOrUpdate(<#= ModelName #> <#= itemName #>);
+        void Delete(int id);
+        void Save();
+    }
+}

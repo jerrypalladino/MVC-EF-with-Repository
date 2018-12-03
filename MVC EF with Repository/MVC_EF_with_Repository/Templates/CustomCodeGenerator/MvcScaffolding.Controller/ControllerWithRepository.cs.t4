@@ -1,0 +1,136 @@
+﻿<#@ template language="C#" HostSpecific="True" Debug="True" #>
+<#@ output extension="cs" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Data.Linq" #>
+<#@ ScaffoldingAssembly Processor="ScaffoldingAssemblyLoader" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="Microsoft.AspNet.Scaffolding.Core.Metadata" #>
+<#@ parameter name="ModelType" type="EnvDTE.CodeType" #>
+<#@ parameter name="NamespaceParentNameOnly" type="System.String" #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using <#= NamespaceParentNameOnly #>.Repositories;
+using <#= NamespaceParentNameOnly #>.Models;
+
+<#
+	var ModelName = ModelType.Name;
+	var itemName = ModelType.Name.ToLower();
+	var Namespace = NamespaceParentNameOnly;
+	var IRepository = "I" + ModelName + "Repository";
+	var IRepositoryVariable = ModelName.ToLower() + "Repository";
+	var ControllerName = ModelName + "Controller";
+#>
+namespace <#= Namespace #>.Controllers
+{   
+<#  
+	var routingName = ModelName;
+#>
+    public class <#= ControllerName  #> : Controller
+    {
+
+		private readonly <#= IRepository  + " " + IRepositoryVariable #>;
+
+
+		public <#= ControllerName #>(<#= IRepository + " " + IRepositoryVariable #>)
+        {
+			this.<#= IRepositoryVariable #> = <#= IRepositoryVariable #>;
+        }
+
+        //
+        // GET: /<#= routingName #>/
+
+        public ViewResult Index()
+        {
+            return View(<#= IRepositoryVariable #>.All);
+        }
+
+        //
+        // GET: /<#= routingName #>/Details/5
+
+        public ViewResult Details(int id)
+        {
+            return View(<#= IRepositoryVariable #>.Find(id));
+        }
+
+        //
+        // GET: /<#= routingName #>/Create
+
+        public ActionResult Create()
+        {
+            return View();
+        } 
+
+        //
+        // POST: /<#= routingName #>/Create
+
+        [HttpPost]
+        public ActionResult Create(<#= ModelName #> <#= itemName #>)
+        {
+            if (ModelState.IsValid) {
+                <#= IRepositoryVariable #>.InsertOrUpdate(<#= itemName #>);
+                <#= IRepositoryVariable #>.Save();
+                return RedirectToAction("Index");
+            } else {
+				return View();
+			}
+        }
+        
+        //
+        // GET: /<#= routingName #>/Edit/5
+ 
+        public ActionResult Edit(int id)
+        {
+			return View(<#= IRepositoryVariable #>.Find(id));
+        }
+
+        //
+        // POST: /<#= routingName #>/Edit/5
+
+        [HttpPost]
+        public ActionResult Edit(<#= ModelName #> <#= itemName #>)
+        {
+            if (ModelState.IsValid) {
+                <#= IRepositoryVariable #>.InsertOrUpdate(<#= itemName #>);
+                <#= IRepositoryVariable #>.Save();
+                return RedirectToAction("Index");
+            } else {
+				return View();
+			}
+        }
+
+        //
+        // GET: /<#= routingName #>/Delete/5
+ 
+        public ActionResult Delete(int id)
+        {
+			return View(<#= IRepositoryVariable #>.Find(id));        
+		}
+
+        //
+        // POST: /<#= routingName #>/Delete/5
+
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int id)
+        {
+            <#= IRepositoryVariable #>.Delete(id);
+            <#= IRepositoryVariable #>.Save();
+
+            return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) {
+                <#= IRepositoryVariable #>.Dispose();
+        }
+            base.Dispose(disposing);
+        }
+    }
+}
+

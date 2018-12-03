@@ -1,0 +1,26 @@
+﻿<#@ Template Language="C#" HostSpecific="True" #>
+<#@ Output extension="cshtml" #>
+<#@ assembly name="System.ComponentModel.DataAnnotations" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Data.Entity" #>
+<#@ assembly name="System.Data.Linq" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="System.Activities.Presentation" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.ComponentModel.DataAnnotations" #>
+<#@ import namespace="System.Data.Linq.Mapping" #>
+<#@ import namespace="System.Data.Objects.DataClasses" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Reflection" #>
+<#@ parameter name="ModelType" type="EnvDTE.CodeType" #>
+
+<# var viewDataType = (EnvDTE.CodeType)ModelType; #>
+<# var Model = (EnvDTE.CodeType)ModelType; #>
+<# if(viewDataType != null) { #>
+@model <#= viewDataType.FullName #>
+
+<# } #>
+@* This partial view defines form fields that will appear when creating and editing entities *@
+@Html.EditorForModel()
